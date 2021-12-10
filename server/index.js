@@ -1,10 +1,12 @@
 const express = require('express')
-const logger =require('./config/logger')
+const { logger, requestId, requestLog } =require('./config/logger')
 const api = require('./api/v1')
 
 const app = express()
 
 // Middlewares
+app.use(requestId);
+app.use(requestLog);
 app.use(express.json());
 
 
