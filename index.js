@@ -1,12 +1,18 @@
 const http = require('http');
 const app = require('./server');
 const fullDate = require('./server/config/date')
-
-
-
 const config = require('./server/config/');
+const { connect } = require('./server/database');
 
-const { port, hostname } = config;
+const { port, hostname, database } = config;
+
+// Database
+connect({
+  protocol: database.protocol,
+  url: database.url,
+  username: database.username,
+  password: database.password,
+});
 
 const server = http.createServer(app);
   
