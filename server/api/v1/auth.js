@@ -11,7 +11,7 @@ exports.signToken = (payload, expiresIn = expires) =>
 
 exports.auth = (req, res, next) => {
   let token = req.headers.authorization || req.headers.query || '';
-  if (token.startsWith('Bearer   ')) {
+  if (token.startsWith('Bearer')) {
     token = token.substring(7);
   }
 
