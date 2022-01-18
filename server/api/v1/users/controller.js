@@ -1,5 +1,6 @@
 const { Model, fields } = require('./model');
 const { signToken } = require('../auth');
+const { mail } = require('../../../utils/email.js');
 
 exports.signin = async (req, res, next) => {
   // Recibir informacion
@@ -63,6 +64,7 @@ exports.signup = async (req, res, next) => {
         token,
       },
     });
+    mail(data);
   } catch (error) {
     next(error);
   }
