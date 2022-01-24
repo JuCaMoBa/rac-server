@@ -1,6 +1,7 @@
 const { Model, fields } = require('./model');
 const { signToken } = require('../auth');
 const { mail } = require('../../../utils/email');
+const { compare } = require('bcryptjs');
 
 exports.signin = async (req, res, next) => {
 	// Recibir informacion
@@ -49,9 +50,19 @@ exports.signin = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
 	const { body = {} } = req;
+	const { password, confirmPassword } = body;
 	const document = new Model(body);
 
 	try {
+		const message = 'confirm password do not match with password';
+		const statusCode = 200;
+		const verified = password === confirmPassword;
+		if (!verified) {
+			return next({
+				message,
+				statusCode,
+			});
+		}
 		const data = await document.save();
 		const status = 201;
 		const token = signToken({
