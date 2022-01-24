@@ -1,7 +1,7 @@
-const { Model, fields } = require('./model');
+const { Model } = require('./model');
 const { signToken } = require('../auth');
 const { mail } = require('../../../utils/email');
-const { compare } = require('bcryptjs');
+const { hash } = require('bcryptjs');
 
 exports.signin = async (req, res, next) => {
 	// Recibir informacion
@@ -65,6 +65,8 @@ exports.signup = async (req, res, next) => {
 		}
 		const data = await document.save();
 		const status = 201;
+		res.status(status);
+
 		const token = signToken({
 			id: data.id,
 		});
@@ -106,11 +108,32 @@ exports.profile = async (req, res, next) => {
 exports.update = async (req, res, next) => {
 	const { body = {}, decoded } = req;
 	const { id } = decoded;
-
+	let { password, confirmPassword } = body;
 	try {
-		const data = await Model.findOneAndUpdate({ _id: id }, body, {
-			new: true,
-		});
+		const message = 'confirm password do not match with password';
+		const statusCode = 200;
+
+		if (password && confirmPassword) {
+			const verified = password === confirmPassword;
+			if (!verified) {
+				return next({
+					message,
+					statusCode,
+				});
+			}
+			password = await hash(password, 10);
+			confirmPassword = await hash(confirmPassword, 10);
+		}
+
+		const data = await Model.findOneAndUpdate(
+			{ _id: id },
+			{ ...body, password, confirmPassword },
+			{
+				new: true,
+			}
+		);
+		/* 		
+		console.log(data); */
 		res.json({
 			data,
 		});

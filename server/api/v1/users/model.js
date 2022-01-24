@@ -76,16 +76,29 @@ user.methods.toJSON = function toJSON() {
 };
 
 user.pre('save', async function save(next) {
-	if (this.isNew) {
+	/* if (this.isModified('password')) {
+		this.password = await hash(this.password, 10);
+	}
+	if (this.isModified('confirmPassword')) {
+		this.confirmPassword = await hash(this.confirmPassword, 10);
+	} */
+
+	try {
+		if (
+			!this.isModified('password') &&
+			!this.isModified('confirmPassword')
+		) {
+			next();
+		}
 		this.password = await hash(this.password, 10);
 		this.confirmPassword = await hash(this.confirmPassword, 10);
+		next();
+	} catch (err) {
+		next({
+			message: err,
+			statusCode: 403,
+		});
 	}
-	next();
-});
-
-user.pre('findOneAndUpdate', async function (next) {
-	this._update.password = await hash(this._update.password, 10);
-	next();
 });
 
 user.methods.verifyPassword = function verifyPassword(value) {
