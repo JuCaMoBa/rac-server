@@ -1,11 +1,16 @@
 const { sign, verify } = require('jsonwebtoken');
 
 const {
-	token: { expires, secret },
+	token: { expires, secret, emailSecret },
 } = require('../../config');
 
 exports.signToken = (payload, expiresIn = expires) =>
 	sign(payload, secret, {
+		expiresIn,
+	});
+
+exports.signEmailToken = (payload, expiresIn = '20m') =>
+	sign(payload, emailSecret, {
 		expiresIn,
 	});
 

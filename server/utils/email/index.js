@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid');
 const config = require('../../config');
-const { getHTML, replaceDoubleBraces } = require('./utils');
+const { getHTML, replaceDoubleBraces } = require('./configFile');
 const { mail } = config;
 
 // eslint-disable-next-line object-curly-newline
