@@ -16,11 +16,12 @@ const router = express.Router();
 
 router.route('/signin').post(controller.signin);
 router.route('/signup').post(sanitizers, controller.signup);
-
+router.route('/confirmation/:email/:token').get(controller.emailVerification);
+router.route('/resendEmail').post(controller.resendEmail);
 router
-  .route('/profile')
-  .get(auth, controller.profile)
-  .put(auth, controller.update)
-  .patch(auth, controller.update);
+	.route('/profile')
+	.get(auth, controller.profile)
+	.put(auth, controller.update)
+	.patch(auth, controller.update);
 
 module.exports = router;

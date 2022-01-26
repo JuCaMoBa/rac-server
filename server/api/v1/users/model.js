@@ -17,7 +17,6 @@ const fields = {
 		required: true,
 		trim: true,
 		maxLength: 128,
-		unique: true,
 	},
 	lastname: {
 		type: String,
@@ -56,6 +55,10 @@ const fields = {
 		type: Boolean,
 		required: true,
 		trim: true,
+	},
+	isVerified: {
+		type: Boolean,
+		default: false,
 	},
 };
 

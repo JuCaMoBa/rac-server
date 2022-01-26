@@ -1,42 +1,53 @@
 const { Model } = require('./model');
-const { signToken } = require('../auth');
+const { signToken, signEmailToken } = require('../auth');
 const { mail } = require('../../../utils/email');
 const { hash } = require('bcryptjs');
+const { localhost } = require('../../../config');
+const { verify } = require('jsonwebtoken');
+const {
+	token: { emailSecret: secret },
+} = require('../../../config');
 
 exports.signin = async (req, res, next) => {
-	// Recibir informacion
 	const { body = {} } = req;
 	const { email, password } = body;
 
 	try {
-		// Buscar el usuario (documento) por el username
 		const user = await Model.findOne({
 			email,
 		}).exec();
-		// SI NO = res no existe 200
-		const message = 'email or password invalid';
+
 		const statusCode = 200;
 
 		if (!user) {
 			return next({
-				message,
-				statusCode,
+				message: `The email address ${email} is not associated with any account. please check and try again!`,
+				statusCode: 401,
 			});
 		}
 
-		// SI = Veriticar Password
 		const verified = await user.verifyPassword(password);
 		if (!verified) {
-			// SI NO = res no existe 200
 			return next({
-				message,
-				statusCode,
+				message: 'The email or password not valid',
+				statusCode: 401,
 			});
 		}
+
+		if (!user.isVerified) {
+			return next({
+				message:
+					'Your Email has not been verified. Please click on resend',
+				statusCode: 401,
+			});
+		}
+
+		res.status(statusCode);
+
 		const token = signToken({
 			id: user.id,
 		});
-		// SI = Devolver la informacion del usuario
+
 		return res.json({
 			data: user,
 			meta: {
@@ -64,11 +75,17 @@ exports.signup = async (req, res, next) => {
 			});
 		}
 		const data = await document.save();
+		const { firstname, email } = data;
 		const status = 201;
 		res.status(status);
 
 		const token = signToken({
 			id: data.id,
+		});
+
+		const emailToken = signEmailToken({
+			id: data.id,
+			email,
 		});
 
 		res.json({
@@ -77,19 +94,65 @@ exports.signup = async (req, res, next) => {
 				token,
 			},
 		});
-		const { firstname, email } = data;
+
 		mail({
 			email,
 			subject: 'Welcome',
 			template: 'server/utils/email/templates/confirmEmail.html',
 			data: {
 				firstname,
+				url: `${localhost}/users/confirmation/${email}/${emailToken}`,
 			},
 		});
 	} catch (error) {
 		next(error);
 	}
 };
+exports.emailVerification = async (req, res, next) => {
+	const { params } = req;
+	const { email, token } = params;
+	const statusCode = 401;
+
+	try {
+		const tokenValue = verify(token, secret, (err, decoded) => {
+			if (err) {
+				return next({
+					message:
+						'Your verification link may have expired. Please click on resend for verify your Email.',
+					statusCode,
+				});
+			}
+			return decoded;
+		});
+
+		if (!(email === tokenValue.email)) {
+			return next({
+				message: 'Unauthorized',
+				statusCode,
+			});
+		}
+		const user = await Model.findById(tokenValue.id).exec();
+
+		if (!user) {
+			return next({
+				message:
+					'We were unable to find a user for this verification. Please SignUp!',
+				statusCode,
+			});
+		}
+		res.status(200);
+
+		user.isVerified = true;
+		await user.save();
+
+		res.json({
+			data: user,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+exports.resendEmail = async (req, res, next) => {};
 
 exports.profile = async (req, res, next) => {
 	const { decoded } = req;
@@ -97,6 +160,7 @@ exports.profile = async (req, res, next) => {
 
 	try {
 		const data = await Model.findById(id);
+
 		res.json({
 			data,
 		});
@@ -111,14 +175,13 @@ exports.update = async (req, res, next) => {
 	let { password, confirmPassword } = body;
 	try {
 		const message = 'confirm password do not match with password';
-		const statusCode = 200;
 
 		if (password && confirmPassword) {
 			const verified = password === confirmPassword;
 			if (!verified) {
 				return next({
 					message,
-					statusCode,
+					statusCode: 401,
 				});
 			}
 			password = await hash(password, 10);
@@ -132,8 +195,7 @@ exports.update = async (req, res, next) => {
 				new: true,
 			}
 		);
-		/* 		
-		console.log(data); */
+
 		res.json({
 			data,
 		});
