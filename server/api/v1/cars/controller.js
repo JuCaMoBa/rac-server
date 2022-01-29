@@ -1,15 +1,14 @@
 const { filterByNested } = require('../../../utils/utils');
-const { Model, fields, references } = require('./model');
-const { Model: User } = require('../users/model');
-
+const { Model: model, fields, references } = require('./model');
+const { Model: Owner } = require('../owners/model');
 const referencesNames = [...Object.getOwnPropertyNames(references)];
 
 exports.parentId = async (req, res, next) => {
   const { params = {} } = req;
-  const { user = '' } = params;
+  const { id = '' } = params;
 
-  if (user) {
-    const data = await User.findById(user).exec();
+  if (id) {
+    const data = await Owner.findById(id).exec();
     if (data) {
       next();
     } else {
@@ -28,12 +27,12 @@ exports.parentId = async (req, res, next) => {
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
-  const { populate } = filterByNested(params, referencesNames);
 
   try {
-    const data = await Model.findById(id).populate(populate);
+    const data = await model.findById(id);
+
     if (!data) {
-      const message = `${Model.modelName} not found`;
+      const message = `${model.modelName} not found`;
       next({
         message,
         statusCode: 404,
@@ -51,10 +50,10 @@ exports.id = async (req, res, next) => {
 exports.all = async (req, res, next) => {
   const { params } = req;
 
-  const { filters, populate } = filterByNested(params, updatedReferencesNames);
+  const { filters } = filterByNested;
 
-  const docs = Model.find(filters).populate(populate);
-  const all = Model.countDocuments(filters);
+  const docs = model.find(filters);
+  const all = model.countDocuments(filters);
 
   try {
     const response = await Promise.all([docs.exec(), all.exec()]);
@@ -72,9 +71,9 @@ exports.create = async (req, res, next) => {
   const { body = {}, decoded } = req;
   const { id } = decoded;
 
-  const document = new Model({
+  const document = new model({
     ...body,
-    user: id,
+    owner: id,
   });
 
   try {
