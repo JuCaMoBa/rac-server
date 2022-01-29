@@ -144,10 +144,10 @@ exports.emailVerification = async (req, res, next) => {
 		res.status(200);
 
 		owner.isVerified = true;
-		await user.save();
+		await owner.save();
 
 		res.json({
-			data: user,
+			data: owner,
 		});
 	} catch (error) {
 		next(error);
