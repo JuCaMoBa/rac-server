@@ -1,4 +1,4 @@
-const { filterByNested } = require('../../../utils');
+const { filterByNested } = require('../../../utils/utils');
 const { Model, fields, references } = require('./model');
 const { Model: User } = require('../users/model');
 
