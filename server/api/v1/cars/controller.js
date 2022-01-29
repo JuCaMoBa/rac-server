@@ -27,9 +27,10 @@ exports.parentId = async (req, res, next) => {
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
+  const { populate } = filterByNested(params, referencesNames);
 
   try {
-    const data = await model.findById(id);
+    const data = await model.findById(id).populate(populate);
 
     if (!data) {
       const message = `${model.modelName} not found`;
@@ -65,6 +66,14 @@ exports.all = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+exports.read = async (req, res, next) => {
+  const { doc = {} } = req;
+
+  res.json({
+    data: doc,
+  });
 };
 
 exports.create = async (req, res, next) => {

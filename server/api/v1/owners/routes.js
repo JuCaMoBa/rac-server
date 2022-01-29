@@ -2,6 +2,7 @@ const express = require('express');
 const { sanitizers } = require('./model');
 const controller = require('./controller');
 const { auth } = require('../auth');
+const carsRouter = require('../cars/routes');
 
 const router = express.Router();
 
@@ -19,9 +20,14 @@ router.route('/signup').post(sanitizers, controller.signup);
 router.route('/confirmation/:email/:token').get(controller.emailVerification);
 
 router
-	.route('/profile')
-	.get(auth, controller.profile)
-	.put(auth, controller.update)
-	.patch(auth, controller.update);
+  .route('/profile')
+  .get(auth, controller.profile)
+  .put(auth, controller.update)
+  .patch(auth, controller.update);
+
+router.param('id', controller.id);
+router.route('/:id').get(auth, controller.read);
+
+router.use('/:owners/cars', carsRouter);
 
 module.exports = router;
