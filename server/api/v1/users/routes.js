@@ -24,4 +24,7 @@ router
 	.put(auth, controller.update)
 	.patch(auth, controller.update);
 
+router.param('id', controller.id);
+router.route('/:id').get(auth, controller.read);
+
 module.exports = router;

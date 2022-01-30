@@ -45,11 +45,14 @@ exports.auth = (req, res, next) => {
 
 exports.owner = (req, res, next) => {
 	const { decoded, doc } = req;
-	const { id } = decoded;
-	const {
-		user: { id: userId },
-	} = doc;
 
+	const { id } = decoded;
+	// console.log('ID: ', id);
+	const {
+		owner: { id: userId },
+	} = doc;
+	console.log(doc);
+	// console.log('User ID: ', userId);
 	if (id !== userId) {
 		const message = 'Forbidden';
 		const statusCode = 403;

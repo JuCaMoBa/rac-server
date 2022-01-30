@@ -4,26 +4,15 @@ const { isEmail } = require('validator');
 const { body } = require('express-validator');
 
 const sanitizers = [
-	body('firstname').escape(),
-	body('lastname').escape(),
+	body('firstName').escape(),
+	body('lastName').escape(),
 	body('email').escape(),
 	body('password').escape(),
+	body('confirmPassword').escape(),
 	body('terms').escape(),
 ];
 
 const fields = {
-	firstname: {
-		type: String,
-		required: true,
-		trim: true,
-		maxLength: 128,
-	},
-	lastname: {
-		type: String,
-		required: true,
-		trim: true,
-		maxLength: 256,
-	},
 	email: {
 		type: String,
 		required: true,
@@ -49,6 +38,18 @@ const fields = {
 		required: true,
 		trim: true,
 		minLength: 6,
+		maxLength: 256,
+	},
+	firstName: {
+		type: String,
+		required: true,
+		trim: true,
+		maxLength: 128,
+	},
+	lastName: {
+		type: String,
+		required: true,
+		trim: true,
 		maxLength: 256,
 	},
 	terms: {

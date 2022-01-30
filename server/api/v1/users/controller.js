@@ -8,6 +8,28 @@ const {
 	token: { emailSecret: secret },
 } = require('../../../config');
 
+exports.id = async (req, res, next) => {
+	const { params = {} } = req;
+	const { id = '' } = params;
+
+	try {
+		const data = await Model.findById(id);
+		if (!data) {
+			const message = `${Model.modelName} not found`;
+			next({
+				message,
+				statusCode: 404,
+				level: 'warn',
+			});
+		} else {
+			req.doc = data;
+			next();
+		}
+	} catch (error) {
+		next(error);
+	}
+};
+
 exports.signin = async (req, res, next) => {
 	const { body = {} } = req;
 	const { email, password } = body;
@@ -75,7 +97,7 @@ exports.signup = async (req, res, next) => {
 			});
 		}
 		const data = await document.save();
-		const { firstname, email } = data;
+		const { firstName, email } = data;
 		const status = 201;
 		res.status(status);
 
@@ -100,7 +122,7 @@ exports.signup = async (req, res, next) => {
 			subject: 'Welcome',
 			template: 'server/utils/email/templates/confirmEmail.html',
 			data: {
-				firstname,
+				firstName,
 				url: `${localhost}/users/confirmation/${email}/${emailToken}`,
 			},
 		});
@@ -108,6 +130,15 @@ exports.signup = async (req, res, next) => {
 		next(error);
 	}
 };
+
+exports.read = async (req, res, next) => {
+	const { doc = {} } = req;
+
+	res.json({
+		data: doc,
+	});
+};
+
 exports.emailVerification = async (req, res, next) => {
 	const { params } = req;
 	const { email, token } = params;
