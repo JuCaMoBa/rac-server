@@ -1,6 +1,7 @@
 const express = require('express');
 const { sanitizers } = require('./model');
 const controller = require('./controller');
+const { auth } = require('../auth');
 
 const router = express.Router();
 
@@ -15,7 +16,15 @@ const router = express.Router();
 
 router.route('/signin').post(controller.signin);
 router.route('/signup').post(sanitizers, controller.signup);
+router.route('/confirmation/:email/:token').get(controller.emailVerification);
+router.route('/resendEmail').post(controller.resendEmail);
+router
+	.route('/profile')
+	.get(auth, controller.profile)
+	.put(auth, controller.update)
+	.patch(auth, controller.update);
 
-
+router.param('id', controller.id);
+router.route('/:id').get(auth, controller.read);
 
 module.exports = router;
