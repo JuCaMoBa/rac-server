@@ -9,11 +9,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npm run lint-files -- server index.js --ext .js,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix ",
-    "lint-files": "eslint --cache --cache-location='.cache/' -f friendly",
+    "lint-files": "eslint --cache --cache-location=.cache/' -f friendly",
     "prepare": "husky install"
   },
   "lint-staged": {
     "server/**/*.{js,ts,tsx}": [
+      "eslint --fix -f friendly"
+    ],
+    "*.{js,ts,tsx}": [
       "eslint --fix -f friendly"
     ]
   },
