@@ -6,16 +6,27 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon index",
     "start": "cross-env NODE_ENV=production node index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npm run lint-files -- server index.js --ext .js,.ts,.tsx",
+    "lint:fix": "npm run lint -- --fix ",
+    "lint-files": "eslint --cache --cache-location='.cache/' -f friendly",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "server/**/*.{js,ts,tsx}": [
+      "eslint --fix -f friendly"
+    ]
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.28.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
     "express-validator": "^6.14.0",
     "inline-css": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
@@ -30,6 +41,12 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-formatter-friendly": "^7.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.2",
     "nodemon": "^2.0.15"
   }
 }
