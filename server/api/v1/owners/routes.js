@@ -7,7 +7,7 @@ const carsRouter = require('../cars/routes');
 const router = express.Router();
 
 /*
- 
+
  * /api/owners/signin     POST   - Signin
  * /api/owners/signup     POST   - Signup
  * /api/owners/profile    GET    - Get the profile of the current user
@@ -20,10 +20,10 @@ router.route('/signup').post(sanitizers, controller.signup);
 router.route('/confirmation/:email/:token').get(controller.emailVerification);
 
 router
-	.route('/profile')
-	.get(auth, controller.profile)
-	.put(auth, controller.update)
-	.patch(auth, controller.update);
+  .route('/profile')
+  .get(auth, controller.profile)
+  .put(auth, controller.update)
+  .patch(auth, controller.update);
 
 router.param('id', controller.id);
 router.route('/:id').get(auth, controller.read);

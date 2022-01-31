@@ -1,0 +1,25 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["airbnb-base"],
+  "parserOptions": {
+    "ecmaVersion": 13
+  },
+  "rules": {
+    "linebreak-style": ["error", "windows"],
+    "no-console": "off",
+    "indent": ["error", 2],
+
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "next|res"
+      }
+    ],
+    "max-len": ["error", { "code": 130 }],
+    "implicit-arrow-linebreak": "off"
+  }
+}

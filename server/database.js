@@ -1,41 +1,41 @@
-const mongoose = require("mongoose");
-const { logger } = require("./config/logger");
+const mongoose = require('mongoose');
+const { logger } = require('./config/logger');
 
 exports.connect = (
-  { protocol = "mongodb", url = "", username, password },
-  options = {}
+  {
+    protocol = 'mongodb', url = '', username, password,
+  },
+  options = {},
 ) => {
-  let dburl = "";
-  const MONGO_DB_URI = process.env.MONGO_DB_URI;
+  let dburl = '';
+  const { MONGO_DB_URI } = process.env;
   if (MONGO_DB_URI) {
     dburl = MONGO_DB_URI;
+  } else if (username && password) {
+    dburl = `${protocol}://${username}:${password}@${url}`;
   } else {
-    if (username && password) {
-      dburl = `${protocol}://${username}:${password}@${url}`;
-    } else {
-      dburl = `${protocol}://${url}`;
-    }
+    dburl = `${protocol}://${url}`;
   }
 
   mongoose.connect(dburl, {
-    ...options
+    ...options,
   });
 
-  mongoose.connection.on("connected", () => {
-    logger.info("Database connected");
+  mongoose.connection.on('connected', () => {
+    logger.info('Database connected');
   });
 
-  mongoose.connection.on("close", () => {
-    logger.info("Database disconnected");
+  mongoose.connection.on('close', () => {
+    logger.info('Database disconnected');
   });
 
-  mongoose.connection.on("error", (error) => {
+  mongoose.connection.on('error', (error) => {
     logger.error(`Database error: ${error}`);
   });
 
-  process.on("SIGINT", () => {
+  process.on('SIGINT', () => {
     mongoose.connection.close(() => {
-      logger.info("Database disconnected because app termination");
+      logger.info('Database disconnected because app termination');
       process.exit(0);
     });
   });
@@ -43,6 +43,6 @@ exports.connect = (
 
 exports.disconnect = () => {
   mongoose.connection.close(() => {
-    logger.info("Database disconnected successful");
+    logger.info('Database disconnected successful');
   });
 };
