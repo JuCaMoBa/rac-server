@@ -1,10 +1,11 @@
-const express = require('express')
-const { logger, requestId, requestLog } =require('./config/logger')
-const api = require('./api/v1')
+const express = require('express');
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
+const { logger, requestId, requestLog } = require('./config/logger');
+const api = require('./api/v1');
 const { cors: corsConfig } = require('./config');
 
-const app = express()
+const app = express();
 
 // Middlewares
 app.use(
@@ -18,7 +19,12 @@ app.use(
 app.use(requestId);
 app.use(requestLog);
 app.use(express.json());
-
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    debug: true,
+  }),
+);
 
 app.use('/api', api);
 
@@ -53,7 +59,5 @@ app.use((error, req, res, next) => {
     error,
   });
 });
-
-
 
 module.exports = app;

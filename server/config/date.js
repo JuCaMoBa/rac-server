@@ -1,26 +1,24 @@
-let date_ob = new Date();
+const dateOb = new Date();
 
 // current date
 // adjust 0 before single digit date
-let date = ("0" + date_ob.getDate()).slice(-2);
+const date = `0${dateOb.getDate()}`.slice(-2);
 
 // current month
-let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+const month = `0${dateOb.getMonth() + 1}`.slice(-2);
 
 // current year
-let year = date_ob.getFullYear();
+const year = dateOb.getFullYear();
 
 // current hours
-let hours = date_ob.getHours();
+const hours = dateOb.getHours();
 
 // current minutes
-let minutes = date_ob.getMinutes();
+const minutes = dateOb.getMinutes();
 
 // current seconds
-let seconds = date_ob.getSeconds();
-
-
+const seconds = dateOb.getSeconds();
 
 // prints date & time in YYYY-MM-DD HH:MM:SS format
-const fullDate = (year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
+const fullDate = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
 module.exports = fullDate;
