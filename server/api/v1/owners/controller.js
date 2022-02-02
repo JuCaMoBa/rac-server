@@ -5,7 +5,7 @@ const { signToken, signEmailToken } = require('../auth');
 const { mail } = require('../../../utils/email');
 const { localhost } = require('../../../config');
 const {
-  token: { emailSecret: secret },
+  token: { emailSecret, secret },
 } = require('../../../config');
 
 exports.id = async (req, res, next) => {
@@ -80,10 +80,9 @@ exports.signin = async (req, res, next) => {
   }
 };
 
-exports.signup = async (req, res, next) => {
-  const { body = {} } = req;
-  const { password, confirmPassword } = body;
-  const document = new Model(body);
+exports.initSignup = async (req, res, next) => {
+  const { body: owner = {} } = req;
+  const { password, confirmPassword } = owner;
 
   try {
     const message = 'confirm password do not match with password';
@@ -95,27 +94,19 @@ exports.signup = async (req, res, next) => {
         statusCode,
       });
     }
-    const data = await document.save();
-    const { firstName, email } = data;
+
+    const { firstName, email } = owner;
     const status = 201;
     res.status(status);
 
     const token = signToken({
-      id: data.id,
+      email: owner.email,
     });
 
     const emailToken = signEmailToken({
-      id: data.id,
-      email,
+      data: owner,
+      token,
     });
-
-    res.json({
-      data,
-      meta: {
-        token,
-      },
-    });
-
     mail({
       email,
       subject: 'Welcome',
@@ -125,6 +116,7 @@ exports.signup = async (req, res, next) => {
         url: `${localhost}/owners/confirmation/${email}/${emailToken}`,
       },
     });
+    res.send();
   } catch (error) {
     next(error);
   }
@@ -138,13 +130,13 @@ exports.read = async (req, res, next) => {
   });
 };
 
-exports.emailVerification = async (req, res, next) => {
+exports.emailConfirmation = async (req, res, next) => {
   const { params } = req;
   const { email, token } = params;
   const statusCode = 401;
 
   try {
-    const tokenValue = verify(token, secret, (err, decoded) => {
+    const tokenValue = verify(token, emailSecret, (err, decoded) => {
       if (err) {
         return next({
           message:
@@ -154,35 +146,44 @@ exports.emailVerification = async (req, res, next) => {
       }
       return decoded;
     });
-
-    if (!(email === tokenValue.email)) {
+    const { data, token: tokenOwner } = tokenValue;
+    if (!(email === data.email)) {
       next({
         message: 'Unauthorized',
         statusCode,
       });
     }
-    const owner = await Model.findById(tokenValue.id).exec();
-
-    if (!owner) {
-      next({
-        message:
-          'We were unable to find a user for this verification. Please SignUp!',
-        statusCode,
-      });
-    }
-    res.status(200);
-
-    owner.isVerified = true;
-    await owner.save();
-
-    res.json({
-      data: owner,
-    });
+    const document = new Model(data);
+    document.isVerified = true;
+    await document.save();
+    res.redirect(`http://localhost:3000/emailverified/${tokenOwner}`);
   } catch (error) {
     next(error);
   }
 };
+exports.signUp = async (req, res, next) => {
+  const { body } = req;
+  const { token } = body;
 
+  const data = verify(token, secret, (err, decoded) => {
+    if (err) {
+      next({
+        message: 'Unauthorized',
+        statusCode: 401,
+      });
+    }
+    return decoded;
+  });
+
+  const owner = await Model.findOne({ email: data.email }).exec();
+
+  res.status(200).json({
+    data: owner,
+    meta: {
+      token,
+    },
+  });
+};
 exports.profile = async (req, res, next) => {
   const { decoded } = req;
   const { id } = decoded;
