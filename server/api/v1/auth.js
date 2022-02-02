@@ -1,7 +1,7 @@
 const { sign, verify } = require('jsonwebtoken');
 
 const {
-  token: { expires, secret },
+  token: { expires, secret, emailSecret },
 } = require('../../config');
 
 exports.signToken = (payload, expiresIn = expires) =>
@@ -9,9 +9,14 @@ exports.signToken = (payload, expiresIn = expires) =>
     expiresIn,
   });
 
+exports.signEmailToken = (payload, expiresIn = '20m') =>
+  sign(payload, emailSecret, {
+    expiresIn,
+  });
+
 exports.auth = (req, res, next) => {
   let token = req.headers.authorization || req.headers.query || '';
-  if (token.startsWith('Bearer   ')) {
+  if (token.startsWith('Bearer')) {
     token = token.substring(7);
   }
 
@@ -40,11 +45,14 @@ exports.auth = (req, res, next) => {
 
 exports.owner = (req, res, next) => {
   const { decoded, doc } = req;
+
   const { id } = decoded;
+  // console.log('ID: ', id);
   const {
-    user: { id: userId },
+    owner: { id: userId },
   } = doc;
 
+  // console.log('User ID: ', userId);
   if (id !== userId) {
     const message = 'Forbidden';
     const statusCode = 403;
