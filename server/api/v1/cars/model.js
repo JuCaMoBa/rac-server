@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const { body } = require('express-validator');
 
 const sanitizers = [
-  body('modelcar').escape(),
+  body('model').escape(),
   body('price').escape(),
   body('carphoto').escape(),
 ];
 
 const fields = {
-  modelcar: {
+  model: {
     type: String,
     required: true,
     trim: true,
@@ -17,6 +17,22 @@ const fields = {
   price: {
     type: Number,
     required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  make: {
+    type: String,
+    required: true,
+  },
+  seats: {
+    type: Number,
+    required: true,
+  },
+  isRented: {
+    type: Boolean,
+    default: false,
   },
   carphoto: {
     type: String,

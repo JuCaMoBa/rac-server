@@ -62,7 +62,13 @@ const fields = {
     default: false,
   },
 };
-
+/* const virtuals = {
+  comments: {
+    ref: 'cars',
+    localField: '_id',
+    foreignField: 'tweet',
+  },
+}; */
 const hiddenFields = ['password', 'confirmPassword'];
 
 const user = new mongoose.Schema(fields, {

@@ -1,4 +1,10 @@
-const { filterByNested } = require('../../../utils/utils');
+const {
+  filterByNested,
+  filterCarsByPrice,
+  filterCarsByType,
+  filterCarsByMake,
+  filterCarsBySeats,
+} = require('../../../utils/utils');
 const { Model, references } = require('./model');
 const { Model: Owner } = require('../owners/model');
 // const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
@@ -52,7 +58,12 @@ exports.id = async (req, res, next) => {
 };
 
 exports.all = async (req, res, next) => {
-  const { params } = req;
+  const { params, query = {} } = req;
+  const {
+    price, type, make, seats,
+  } = query;
+
+  console.log(query);
   const { filters, populate } = filterByNested(params, referencesNames);
 
   const docs = Model.find(filters).populate(populate);
@@ -61,9 +72,15 @@ exports.all = async (req, res, next) => {
   try {
     const response = await Promise.all([docs.exec(), all.exec()]);
     const [data] = response;
+    let carData = data;
+
+    if (price) carData = filterCarsByPrice(carData, price);
+    if (type) carData = filterCarsByType(carData, type);
+    if (make) carData = filterCarsByMake(carData, make);
+    if (seats) carData = filterCarsBySeats(carData, seats);
 
     res.json({
-      data,
+      data: carData,
     });
   } catch (error) {
     next(error);
