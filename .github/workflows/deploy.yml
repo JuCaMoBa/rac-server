@@ -10,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run ESlint on rac-server
-        run: cd rac-server
-          npm ci
-          npx eslint . --ext .js,.jsx
+        run: 
+        <!-- prettier-ignore -->
+         cd RAC-SERVER
+         npm ci
+         npx eslint . --ext .js,.jsx
