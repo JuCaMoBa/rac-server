@@ -77,8 +77,12 @@ const fields = {
     maxLength: 128,
   },
   cellphone: {
-    type: Number,
+    type: String,
     trim: true,
+  },
+  photo: {
+    type: String,
+    default: '',
   },
 };
 

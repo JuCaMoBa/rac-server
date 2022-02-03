@@ -25,6 +25,11 @@ router
   .put(auth, controller.update)
   .patch(auth, controller.update);
 
+router
+  .route('/profile/photo')
+  .put(auth, controller.updatePhoto)
+  .patch(auth, controller.updatePhoto);
+
 router.param('id', controller.id);
 router.route('/:id').get(auth, controller.read);
 

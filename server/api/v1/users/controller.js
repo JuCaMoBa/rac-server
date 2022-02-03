@@ -7,6 +7,7 @@ const { localhost } = require('../../../config');
 const {
   token: { secret },
 } = require('../../../config');
+const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
@@ -126,7 +127,6 @@ exports.read = async (req, res, next) => {
   });
 };
 
-// exports.resendEmail = async (req, res, next) => {};
 exports.signUp = async (req, res, next) => {
   const { body } = req;
   const { token } = body;
@@ -151,6 +151,7 @@ exports.signUp = async (req, res, next) => {
     },
   });
 };
+
 exports.profile = async (req, res, next) => {
   const { decoded } = req;
   const { id } = decoded;
@@ -173,6 +174,14 @@ exports.update = async (req, res, next) => {
   try {
     const message = 'confirm password do not match with password';
 
+    let photo = '';
+    if (req.files) {
+      photo = await uploadToCloudinary({
+        file: req.files.file,
+        path: 'renta-car',
+        allowedExts: ['jpg', 'jpeg', 'png'],
+      });
+    }
     if (password && confirmPassword) {
       const verified = password === confirmPassword;
       if (!verified) {
@@ -187,7 +196,12 @@ exports.update = async (req, res, next) => {
 
     const data = await Model.findOneAndUpdate(
       { _id: id },
-      { ...body, password, confirmPassword },
+      {
+        ...body,
+        password,
+        confirmPassword,
+        photo,
+      },
       {
         new: true,
       },
@@ -199,4 +213,29 @@ exports.update = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+exports.updatePhoto = async (req, res, next) => {
+  const { decoded } = req;
+  const { id } = decoded;
+  let photo = '';
+  if (req.files.file) {
+    photo = await uploadToCloudinary({
+      file: req.files.file,
+      path: 'renta-car',
+      allowedExts: ['jpg', 'jpeg', 'png'],
+    });
+  }
+  const data = await Model.findOneAndUpdate(
+    { _id: id },
+    {
+      photo,
+    },
+    {
+      new: true,
+    },
+  );
+  res.json({
+    data,
+  });
 };
