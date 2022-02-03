@@ -12,6 +12,6 @@ jobs:
       - name: Run ESlint on rac-server
         run: 
         <!-- prettier-ignore -->
-         cd RAC-SERVER
+         cd rac-server
          npm ci
          npx eslint . --ext .js,.jsx
