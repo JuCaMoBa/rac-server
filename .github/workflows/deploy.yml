@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run Eslint on RAC-SERVER
-        run: cd RAC-SERVER
-          npm ci
-          npx eslint . --ext .js
+      - name: Run ESlint on rac-server
+        run: 
+        cd rac-server
+        npm ci
+        npx eslint . --ext .js,.jsx
