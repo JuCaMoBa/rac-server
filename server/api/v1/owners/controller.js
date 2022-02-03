@@ -1,11 +1,11 @@
 const { hash } = require('bcryptjs');
 const { verify } = require('jsonwebtoken');
 const { Model } = require('./model');
-const { signToken, signEmailToken } = require('../auth');
+const { signToken } = require('../auth');
 const { mail } = require('../../../utils/email');
 const { localhost } = require('../../../config');
 const {
-  token: { emailSecret, secret },
+  token: { secret },
 } = require('../../../config');
 
 exports.id = async (req, res, next) => {
@@ -100,20 +100,16 @@ exports.initSignup = async (req, res, next) => {
     res.status(status);
 
     const token = signToken({
-      email: owner.email,
+      data: owner,
     });
 
-    const emailToken = signEmailToken({
-      data: owner,
-      token,
-    });
     mail({
       email,
       subject: 'Welcome',
       template: 'server/utils/email/templates/confirmEmail.html',
       data: {
         firstName,
-        url: `${localhost}/owners/confirmation/${email}/${emailToken}`,
+        url: `${localhost}/emailverified/${token}`,
       },
     });
     res.send();
@@ -130,42 +126,11 @@ exports.read = async (req, res, next) => {
   });
 };
 
-exports.emailConfirmation = async (req, res, next) => {
-  const { params } = req;
-  const { email, token } = params;
-  const statusCode = 401;
-
-  try {
-    const tokenValue = verify(token, emailSecret, (err, decoded) => {
-      if (err) {
-        return next({
-          message:
-            'Your verification link may have expired. Please click on resend for verify your Email.',
-          statusCode,
-        });
-      }
-      return decoded;
-    });
-    const { data, token: tokenOwner } = tokenValue;
-    if (!(email === data.email)) {
-      next({
-        message: 'Unauthorized',
-        statusCode,
-      });
-    }
-    const document = new Model(data);
-    document.isVerified = true;
-    await document.save();
-    res.redirect(`http://localhost:3000/emailverified/${tokenOwner}`);
-  } catch (error) {
-    next(error);
-  }
-};
 exports.signUp = async (req, res, next) => {
   const { body } = req;
   const { token } = body;
 
-  const data = verify(token, secret, (err, decoded) => {
+  const { data } = verify(token, secret, (err, decoded) => {
     if (err) {
       next({
         message: 'Unauthorized',
@@ -174,8 +139,9 @@ exports.signUp = async (req, res, next) => {
     }
     return decoded;
   });
-
-  const owner = await Model.findOne({ email: data.email }).exec();
+  const owner = new Model(data);
+  owner.isVerified = true;
+  await owner.save();
 
   res.status(200).json({
     data: owner,

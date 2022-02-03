@@ -61,9 +61,28 @@ const fields = {
     type: Boolean,
     default: false,
   },
+  country: {
+    type: String,
+    trim: true,
+    maxLength: 128,
+  },
+  state: {
+    type: String,
+    trim: true,
+    maxLength: 128,
+  },
+  about: {
+    type: String,
+    trim: true,
+    maxLength: 128,
+  },
+  cellphone: {
+    type: Number,
+    trim: true,
+  },
 };
 /* const virtuals = {
-  comments: {
+  car: {
     ref: 'cars',
     localField: '_id',
     foreignField: 'tweet',
