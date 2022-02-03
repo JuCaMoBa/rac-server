@@ -15,7 +15,6 @@ const config = {
   },
   token: {
     secret: process.env.TOKEN_SECRET,
-    emailSecret: process.env.TOKEN_SECRET_EMAIL,
     expires: process.env.TOKEN_EXPIRES,
   },
   mail: {

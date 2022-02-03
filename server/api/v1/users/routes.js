@@ -16,7 +16,6 @@ const router = express.Router();
 
 router.route('/signin').post(controller.signin);
 router.route('/initSignUp').post(sanitizers, controller.initSignup);
-router.route('/confirmation/:email/:token').get(controller.emailConfirmation);
 router.route('/signup').post(controller.signUp);
 // router.route('/resendEmail').post(controller.resendEmail);
 router
