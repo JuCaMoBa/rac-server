@@ -94,15 +94,15 @@ exports.initSignup = async (req, res, next) => {
         statusCode,
       });
     }
-
+    
     const { firstName, email } = user;
     const status = 201;
     res.status(status);
 
-    const token = signToken({
+   const token = signToken({
       data: user,
     });
-
+    
     mail({
       email,
       subject: 'Welcome',
@@ -126,7 +126,6 @@ exports.read = async (req, res, next) => {
   });
 };
 
-// exports.resendEmail = async (req, res, next) => {};
 exports.signUp = async (req, res, next) => {
   const { body } = req;
   const { token } = body;
@@ -151,6 +150,7 @@ exports.signUp = async (req, res, next) => {
     },
   });
 };
+
 exports.profile = async (req, res, next) => {
   const { decoded } = req;
   const { id } = decoded;

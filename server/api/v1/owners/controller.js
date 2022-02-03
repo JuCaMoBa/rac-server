@@ -134,11 +134,13 @@ exports.signUp = async (req, res, next) => {
     if (err) {
       next({
         message: 'Unauthorized',
+
         statusCode: 401,
       });
     }
     return decoded;
   });
+
   const owner = new Model(data);
   owner.isVerified = true;
   await owner.save();
