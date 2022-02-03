@@ -1,0 +1,15 @@
+name: Deploy
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Eslint on RAC-SERVER
+        run: cd RAC-SERVER
+          npm ci
+          npx eslint . --ext .js
