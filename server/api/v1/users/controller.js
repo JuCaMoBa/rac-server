@@ -94,15 +94,13 @@ exports.initSignup = async (req, res, next) => {
         statusCode,
       });
     }
-    
     const { firstName, email } = user;
     const status = 201;
     res.status(status);
 
-   const token = signToken({
+    const token = signToken({
       data: user,
     });
-    
     mail({
       email,
       subject: 'Welcome',
