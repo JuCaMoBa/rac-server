@@ -11,7 +11,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run ESlint on rac-server
         run: 
-        <!-- prettier-ignore -->
-         cd rac-server
-         npm ci
-         npx eslint . --ext .js,.jsx
+          cd rac-server
+          npm ci
+          npx eslint . --ext .js,.jsx
