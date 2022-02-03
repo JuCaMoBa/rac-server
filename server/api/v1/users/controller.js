@@ -171,17 +171,11 @@ exports.update = async (req, res, next) => {
   const { body = {}, decoded } = req;
   const { id } = decoded;
   let { password, confirmPassword } = body;
+  let photo = '';
+
   try {
     const message = 'confirm password do not match with password';
 
-    let photo = '';
-    if (req.files) {
-      photo = await uploadToCloudinary({
-        file: req.files.file,
-        path: 'renta-car',
-        allowedExts: ['jpg', 'jpeg', 'png'],
-      });
-    }
     if (password && confirmPassword) {
       const verified = password === confirmPassword;
       if (!verified) {
@@ -193,23 +187,45 @@ exports.update = async (req, res, next) => {
       password = await hash(password, 10);
       confirmPassword = await hash(confirmPassword, 10);
     }
+    if (req.files) {
+      photo = await uploadToCloudinary({
+        file: req.files.file,
+        path: 'renta-car',
+        allowedExts: ['jpg', 'jpeg', 'png'],
+      });
+      const data = await Model.findOneAndUpdate(
+        { _id: id },
+        {
+          ...body,
+          password,
+          confirmPassword,
+          photo,
+        },
+        {
+          new: true,
+        },
+      );
 
-    const data = await Model.findOneAndUpdate(
-      { _id: id },
-      {
-        ...body,
-        password,
-        confirmPassword,
-        photo,
-      },
-      {
-        new: true,
-      },
-    );
+      res.json({
+        data,
+      });
+    } else {
+      const data = await Model.findOneAndUpdate(
+        { _id: id },
+        {
+          ...body,
+          password,
+          confirmPassword,
+        },
+        {
+          new: true,
+        },
+      );
 
-    res.json({
-      data,
-    });
+      res.json({
+        data,
+      });
+    }
   } catch (error) {
     next(error);
   }
