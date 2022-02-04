@@ -80,6 +80,10 @@ const fields = {
     type: Number,
     trim: true,
   },
+  photo: {
+    type: String,
+    default: '',
+  },
 };
 const hiddenFields = ['password', 'confirmPassword'];
 
