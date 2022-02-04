@@ -95,7 +95,6 @@ exports.initSignup = async (req, res, next) => {
         statusCode,
       });
     }
-
     const { firstName, email } = user;
     const status = 201;
     res.status(status);
@@ -103,7 +102,6 @@ exports.initSignup = async (req, res, next) => {
     const token = signToken({
       data: user,
     });
-
     mail({
       email,
       subject: 'Welcome',
