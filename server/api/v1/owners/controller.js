@@ -191,7 +191,7 @@ exports.update = async (req, res, next) => {
     if (req.files) {
       photo = await uploadToCloudinary({
         file: req.files.file,
-        path: 'renta-car',
+        path: 'renta-car-profile',
         allowedExts: ['jpg', 'jpeg', 'png'],
       });
 
@@ -239,7 +239,7 @@ exports.updatePhoto = async (req, res, next) => {
   if (req.files.file) {
     photo = await uploadToCloudinary({
       file: req.files.file,
-      path: 'renta-car',
+      path: 'renta-car-profile',
       allowedExts: ['jpg', 'jpeg', 'png'],
     });
   }

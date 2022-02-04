@@ -190,7 +190,7 @@ exports.update = async (req, res, next) => {
     if (req.files) {
       photo = await uploadToCloudinary({
         file: req.files.file,
-        path: 'renta-car',
+        path: 'renta-car-profile',
         allowedExts: ['jpg', 'jpeg', 'png'],
       });
       const data = await Model.findOneAndUpdate(
@@ -238,7 +238,7 @@ exports.updatePhoto = async (req, res, next) => {
   if (req.files.file) {
     photo = await uploadToCloudinary({
       file: req.files.file,
-      path: 'renta-car',
+      path: 'renta-car-profile',
       allowedExts: ['jpg', 'jpeg', 'png'],
     });
   }

@@ -27,14 +27,26 @@ const fields = {
     required: true,
   },
   seats: {
-    type: Number,
+    type: String,
     required: true,
   },
   isRented: {
     type: Boolean,
     default: false,
   },
-  carphoto: {
+  carFrontPhoto: {
+    type: String,
+    default: '',
+  },
+  photo1: {
+    type: String,
+    default: '',
+  },
+  photo2: {
+    type: String,
+    default: '',
+  },
+  photo3: {
     type: String,
     default: '',
   },

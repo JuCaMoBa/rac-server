@@ -7,7 +7,7 @@ const {
 } = require('../../../utils/utils');
 const { Model, references } = require('./model');
 const { Model: Owner } = require('../owners/model');
-// const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
+const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
 
 const referencesNames = [...Object.getOwnPropertyNames(references)];
 
@@ -107,18 +107,40 @@ exports.create = async (req, res, next) => {
   }
 
   try {
-    /* let photo = '';
-    if (req.files.file) {
-      photo = await uploadToCloudinary({
-        file: req.files.file,
-        path: 'renta-car',
+    let carFrontPhoto = '';
+    let photo1 = '';
+    let photo2 = '';
+    let photo3 = '';
+
+    if (req.files) {
+      carFrontPhoto = await uploadToCloudinary({
+        file: req.files.carFrontPhoto,
+        path: 'renta-cars-photo',
         allowedExts: ['jpg', 'jpeg', 'png'],
       });
-    } */
+      photo1 = await uploadToCloudinary({
+        file: req.files.photo1,
+        path: 'renta-cars-photo',
+        allowedExts: ['jpg', 'jpeg', 'png'],
+      });
+      photo2 = await uploadToCloudinary({
+        file: req.files.photo2,
+        path: 'renta-cars-photo',
+        allowedExts: ['jpg', 'jpeg', 'png'],
+      });
+      photo3 = await uploadToCloudinary({
+        file: req.files.photo3,
+        path: 'renta-cars-photo',
+        allowedExts: ['jpg', 'jpeg', 'png'],
+      });
+    }
     const document = new Model({
       ...body,
       owner: id,
-      // carphoto: photo,
+      carFrontPhoto,
+      photo1,
+      photo2,
+      photo3,
     });
     const data = await document.save();
     const status = 201;
