@@ -30,6 +30,12 @@ const fields = {
     type: String,
     required: true,
   },
+  doors: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
   isRented: {
     type: Boolean,
     default: false,

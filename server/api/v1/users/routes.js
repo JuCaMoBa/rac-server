@@ -2,8 +2,11 @@ const express = require('express');
 const { sanitizers } = require('./model');
 const controller = require('./controller');
 const { auth } = require('../auth');
+const rentcar = require('../rentcar/routes');
 
-const router = express.Router();
+const router = express.Router({
+  mergeParams: true,
+});
 
 /*
 
@@ -32,4 +35,5 @@ router
 router.param('id', controller.id);
 router.route('/:id').get(auth, controller.read);
 
+router.use('/:user/rentcar', rentcar);
 module.exports = router;

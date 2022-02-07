@@ -106,13 +106,13 @@ exports.signup = async (req, res, next) => {
       },
     });
 
-    const { firstname, email } = data;
+    const { firstName, email } = data;
     mail({
       email,
       subject: 'Welcome',
       template: 'server/utils/email/templates/welcomeEmail.html',
       data: {
-        firstname,
+        firstName,
       },
     });
   } catch (error) {

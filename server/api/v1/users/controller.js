@@ -1,15 +1,19 @@
 const { hash } = require('bcryptjs');
-const { Model } = require('./model');
+const { Model, virtuals } = require('./model');
 const { signToken } = require('../auth');
 const { mail } = require('../../../utils/email');
 const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
+const { filterByNested } = require('../../../utils/utils');
+
+const referencesNames = Object.getOwnPropertyNames(virtuals);
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
-
+  const { populate } = filterByNested(params, referencesNames);
+  console.log(populate);
   try {
-    const data = await Model.findById(id);
+    const data = await Model.findById(id).populate(populate);
     if (!data) {
       const message = `${Model.modelName} not found`;
       next({
@@ -78,6 +82,7 @@ exports.signin = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
   const { body = {} } = req;
   const { password, confirmPassword } = body;
+
   const document = new Model(body);
 
   try {
@@ -105,13 +110,13 @@ exports.signup = async (req, res, next) => {
       },
     });
 
-    const { firstname, email } = data;
+    const { firstName, email } = data;
     mail({
       email,
       subject: 'Welcome',
       template: 'server/utils/email/templates/welcomeEmail.html',
       data: {
-        firstname,
+        firstName,
       },
     });
   } catch (error) {
@@ -188,9 +193,10 @@ exports.read = async (req, res, next) => {
 exports.profile = async (req, res, next) => {
   const { decoded } = req;
   const { id } = decoded;
-
+  const { populate } = filterByNested({}, referencesNames);
+  console.log(populate);
   try {
-    const data = await Model.findById(id);
+    const data = await Model.findById(id).populate(populate);
 
     res.json({
       data,

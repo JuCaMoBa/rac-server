@@ -5,6 +5,7 @@ const {
   filterCarsByMake,
   filterCarsBySeats,
 } = require('../../../utils/utils');
+
 const { Model, references } = require('./model');
 const { Model: Owner } = require('../owners/model');
 const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
@@ -63,7 +64,6 @@ exports.all = async (req, res, next) => {
     price, type, make, seats,
   } = query;
 
-  console.log(query);
   const { filters, populate } = filterByNested(params, referencesNames);
 
   const docs = Model.find(filters).populate(populate);
