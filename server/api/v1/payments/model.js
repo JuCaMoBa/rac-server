@@ -7,7 +7,11 @@ const schema1 = new mongoose.Schema({
 
 const schema2 = new mongoose.Schema({
   date: { type: Date, default: () => new Date() },
-  status: { type: String, enum: ['created', 'payed', 'cancelled', 'delivered'], default: 'created' },
+  status: {
+    type: String,
+    enum: ['created', 'payed', 'cancelled', 'delivered'],
+    default: 'created',
+  },
   cars: [
     {
       name: String,
