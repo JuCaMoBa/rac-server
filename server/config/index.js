@@ -24,6 +24,7 @@ const config = {
     apiKey: process.env.CLOUDINARY_API_KEY,
     apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
+  localhost: process.env.LOCALHOST,
 };
 
 module.exports = config;
