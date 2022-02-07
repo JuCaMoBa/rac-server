@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const mercadopago = require('mercadopago');
 const { Cars, Order } = require('./model');
+const { localhost } = require('../../../config');
 
 mercadopago.configure({
   access_token: process.env.ACCESS_MP_TOKEN,
@@ -33,7 +34,7 @@ router.post('/', async (req, res, next) => {
     // crear la preferencia de MercadoPago
     const { response } = await mercadopago.preferences.create({
       items,
-      back_urls: { success: 'http://localhost:3000/profile' },
+      back_urls: { success: `${localhost}/profile` },
     });
 
     res.json({ order, preferenceId: response.id });
