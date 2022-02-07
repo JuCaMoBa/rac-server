@@ -23,18 +23,20 @@ router.post('/', async (req, res, next) => {
   try {
     for (let i = 0; i < cars.length; i += 1) {
       // eslint-disable-next-line no-await-in-loop
-      cars[i] = await Cars.findById(new mongoose.Types.ObjectId(cars[i])).lean();
+      cars[i] = await Cars.findById(
+        new mongoose.Types.ObjectId(cars[i]),
+      ).lean();
     }
-    console.log(cars);
     const order = await Order.create({ cars });
     const items = [{ title: cars.name, unit_price: cars.price, quantity: 1 }];
 
-    console.log('sisepudo');
     // crear la preferencia de MercadoPago
-    const { response } = await mercadopago.preferences.create({ items });
-    console.log('sisepudo');
+    const { response } = await mercadopago.preferences.create({
+      items,
+      back_urls: { success: 'http://localhost:3000/profile' },
+    });
+
     res.json({ order, preferenceId: response.id });
-    console.log('sisepudo');
   } catch (e) {
     next(e);
   }
