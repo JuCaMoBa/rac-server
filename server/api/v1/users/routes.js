@@ -2,8 +2,11 @@ const express = require('express');
 const { sanitizers } = require('./model');
 const controller = require('./controller');
 const { auth } = require('../auth');
+const rentcar = require('../rentcar/routes');
 
-const router = express.Router();
+const router = express.Router({
+  mergeParams: true,
+});
 
 /*
 
@@ -15,8 +18,8 @@ const router = express.Router();
  */
 
 router.route('/signin').post(controller.signin);
-router.route('/initSignUp').post(sanitizers, controller.initSignup);
-router.route('/signup').post(controller.signUp);
+// router.route('/initSignUp').post(sanitizers, controller.initSignup);
+router.route('/signup').post(sanitizers, controller.signup);
 // router.route('/resendEmail').post(controller.resendEmail);
 router
   .route('/profile')
@@ -32,4 +35,5 @@ router
 router.param('id', controller.id);
 router.route('/:id').get(auth, controller.read);
 
+router.use('/:user/rentcar', rentcar);
 module.exports = router;

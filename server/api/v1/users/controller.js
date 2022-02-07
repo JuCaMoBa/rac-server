@@ -1,20 +1,19 @@
 const { hash } = require('bcryptjs');
-const { verify } = require('jsonwebtoken');
-const { Model } = require('./model');
+const { Model, virtuals } = require('./model');
 const { signToken } = require('../auth');
 const { mail } = require('../../../utils/email');
-const { localhost } = require('../../../config');
-const {
-  token: { secret },
-} = require('../../../config');
 const uploadToCloudinary = require('../../../utils/uploadToCloudinary');
+const { filterByNested } = require('../../../utils/utils');
+
+const referencesNames = Object.getOwnPropertyNames(virtuals);
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
-
+  const { populate } = filterByNested(params, referencesNames);
+  console.log(populate);
   try {
-    const data = await Model.findById(id);
+    const data = await Model.findById(id).populate(populate);
     if (!data) {
       const message = `${Model.modelName} not found`;
       next({
@@ -56,13 +55,13 @@ exports.signin = async (req, res, next) => {
         statusCode: 401,
       });
     }
-
+    /*
     if (!user.isVerified) {
       return next({
         message: 'Your Email has not been verified. Please click on resend',
         statusCode: 401,
       });
-    }
+    } */
 
     res.status(statusCode);
 
@@ -80,8 +79,51 @@ exports.signin = async (req, res, next) => {
     return next(error);
   }
 };
+exports.signup = async (req, res, next) => {
+  const { body = {} } = req;
+  const { password, confirmPassword } = body;
 
-exports.initSignup = async (req, res, next) => {
+  const document = new Model(body);
+
+  try {
+    const message = 'confirm password do not match with password';
+    const statusCode = 200;
+    const verified = password === confirmPassword;
+    if (!verified) {
+      next({
+        message,
+        statusCode,
+      });
+    }
+    const data = await document.save();
+    const status = 201;
+    res.status(status);
+
+    const token = signToken({
+      id: data.id,
+    });
+
+    res.json({
+      data,
+      meta: {
+        token,
+      },
+    });
+
+    const { firstName, email } = data;
+    mail({
+      email,
+      subject: 'Welcome',
+      template: 'server/utils/email/templates/welcomeEmail.html',
+      data: {
+        firstName,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+/* exports.initSignup = async (req, res, next) => {
   const { body: user = {} } = req;
   const { password, confirmPassword } = user;
 
@@ -116,15 +158,6 @@ exports.initSignup = async (req, res, next) => {
     next(error);
   }
 };
-
-exports.read = async (req, res, next) => {
-  const { doc = {} } = req;
-
-  res.json({
-    data: doc,
-  });
-};
-
 exports.signUp = async (req, res, next) => {
   const { body } = req;
   const { token } = body;
@@ -148,14 +181,22 @@ exports.signUp = async (req, res, next) => {
       token,
     },
   });
+}; */
+exports.read = async (req, res, next) => {
+  const { doc = {} } = req;
+
+  res.json({
+    data: doc,
+  });
 };
 
 exports.profile = async (req, res, next) => {
   const { decoded } = req;
   const { id } = decoded;
-
+  const { populate } = filterByNested({}, referencesNames);
+  console.log(populate);
   try {
-    const data = await Model.findById(id);
+    const data = await Model.findById(id).populate(populate);
 
     res.json({
       data,
@@ -188,7 +229,7 @@ exports.update = async (req, res, next) => {
     if (req.files) {
       photo = await uploadToCloudinary({
         file: req.files.file,
-        path: 'renta-car',
+        path: 'renta-car-profile',
         allowedExts: ['jpg', 'jpeg', 'png'],
       });
       const data = await Model.findOneAndUpdate(
@@ -236,7 +277,7 @@ exports.updatePhoto = async (req, res, next) => {
   if (req.files.file) {
     photo = await uploadToCloudinary({
       file: req.files.file,
-      path: 'renta-car',
+      path: 'renta-car-profile',
       allowedExts: ['jpg', 'jpeg', 'png'],
     });
   }

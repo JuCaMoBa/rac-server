@@ -57,10 +57,7 @@ const fields = {
     required: true,
     trim: true,
   },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
+
   country: {
     type: String,
     trim: true,
@@ -85,10 +82,22 @@ const fields = {
     default: '',
   },
 };
+
+const virtuals = {
+  rentCar: {
+    ref: 'rentCar',
+    localField: '_id',
+    foreignField: 'user',
+  },
+};
+
 const hiddenFields = ['password', 'confirmPassword'];
 
 const user = new mongoose.Schema(fields, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  },
 });
 
 user.methods.toJSON = function toJSON() {
@@ -120,11 +129,12 @@ user.pre('save', async function save(next) {
 user.methods.verifyPassword = function verifyPassword(value) {
   return compare(value, this.password);
 };
-
+user.virtual('rentCar', virtuals.rentCar);
 const model = mongoose.model('user', user);
 
 module.exports = {
   Model: model,
   fields,
+  virtuals,
   sanitizers,
 };

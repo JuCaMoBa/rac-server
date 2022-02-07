@@ -57,10 +57,7 @@ const fields = {
     required: true,
     trim: true,
   },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
+
   country: {
     type: String,
     trim: true,
